@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
-import '../../../config/app_routes.dart';
-import '../../../config/app_theme.dart';
-import '../../../core/date_formatter.dart';
-import '../../../data/task_model.dart';
-import '../../presentation//task_provider.dart';
-import '../../presentation/widgets/common_widgets.dart';
+import '../../config/app_routes.dart';
+import '../../config/app_theme.dart';
+import '../../core/date_formatter.dart';
+import '../../data/task_model.dart';
+import '../task_provider.dart';
+import 'common_widgets.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -27,8 +27,11 @@ class TaskCard extends StatelessWidget {
       background: _deleteBackground(),
       child: Card(
         child: InkWell(
-          onTap: () =>
-              Navigator.pushNamed(context, AppRoutes.taskDetail, arguments: task.id),
+          onTap: () => Navigator.pushNamed(
+            context,
+            AppRoutes.taskDetail,
+            arguments: task.id,
+          ),
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -40,7 +43,10 @@ class TaskCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         task.title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(
                           fontWeight: FontWeight.w600,
                           decoration: task.status == TaskStatus.done
                               ? TextDecoration.lineThrough
@@ -54,7 +60,14 @@ class TaskCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    _StatusDot(status: task.status),
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: AppTheme.statusColor(task.status),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                   ],
                 ),
                 if (task.description.isNotEmpty) ...[
@@ -82,15 +95,11 @@ class TaskCard extends StatelessWidget {
                           ? Icons.warning_amber_rounded
                           : Icons.calendar_today_rounded,
                       size: 14,
-                      color: isOverdue
-                          ? AppTheme.overdueColor
-                          : Colors.grey,
+                      color: isOverdue ? AppTheme.overdueColor : Colors.grey,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      isOverdue
-                          ? 'Overdue · ${DateFormatter.format(task.dueDate)}'
-                          : DateFormatter.format(task.dueDate),
+                      DateFormatter.format(task.dueDate),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -106,7 +115,7 @@ class TaskCard extends StatelessWidget {
       ).animate().fadeIn(
         delay: Duration(milliseconds: 60 * index),
         duration: 300.ms,
-      ).slideX(begin: 0.1, end: 0),
+      ),
     );
   }
 
@@ -115,10 +124,9 @@ class TaskCard extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete Task'),
-        content:
-        Text('Are you sure you want to delete "${task.title}"?'),
-        shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: Text('Delete "${task.title}"?'),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -148,25 +156,8 @@ class TaskCard extends StatelessWidget {
         color: AppTheme.overdueColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Icon(Icons.delete_rounded, color: AppTheme.overdueColor),
-    );
-  }
-}
-
-class _StatusDot extends StatelessWidget {
-  final TaskStatus status;
-
-  const _StatusDot({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(
-        color: AppTheme.statusColor(status),
-        shape: BoxShape.circle,
-      ),
+      child:
+      const Icon(Icons.delete_rounded, color: AppTheme.overdueColor),
     );
   }
 }

@@ -18,17 +18,4 @@ class DateFormatter {
         dueDate.month == now.month &&
         dueDate.day == now.day;
   }
-
-  static bool isDueSoon(DateTime dueDate) {
-    final now = DateTime.now();
-    final diff = dueDate.difference(now).inDays;
-    return diff >= 0 && diff <= 2;
-  }
-
-  static String relativeLabel(DateTime dueDate) {
-    if (isDueToday(dueDate)) return 'Due Today';
-    if (isOverdue(dueDate)) return 'Overdue';
-    if (isDueSoon(dueDate)) return 'Due Soon';
-    return 'Due ${format(dueDate)}';
-  }
 }

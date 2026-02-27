@@ -6,13 +6,18 @@ import 'config/app_routes.dart';
 import 'config/app_theme.dart';
 import 'data/auth_service.dart';
 import 'data/task_service.dart';
+import 'firebase_options.dart';
 import 'presentation/auth_provider.dart';
 import 'presentation/task_provider.dart';
 import 'presentation/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   runApp(const TaskFlowApp());
 }
 

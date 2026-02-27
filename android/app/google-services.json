@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1007827805106",
+    "project_id": "todoflow-ecd8d",
+    "storage_bucket": "todoflow-ecd8d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007827805106:android:d9064fc3af982856097aab",
+        "android_client_info": {
+          "package_name": "com.example.todoflow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_BRKTNl3sYOdk2WH85odAgMXx2L5w-CY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

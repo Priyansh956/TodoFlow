@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import '../../core/app_exceptions.dart';
-import '../../data/user_model.dart';
-import '../../data/auth_service.dart';
+import '../core/app_exceptions.dart';
+import '../data/user_model.dart';
+import '../data/auth_service.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
@@ -23,16 +23,30 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _status == AuthStatus.loading;
 
   void _init() {
-    _authService.authStateChanges.listen((firebaseUser) async {
-      if (firebaseUser != null) {
-        _user = await _authService.getCachedUser();
-        _status = AuthStatus.authenticated;
-      } else {
-        _user = null;
+    // Safety net: if Firebase stream never emits within 6s, go to unauthenticated
+    Future.delayed(const Duration(seconds: 6), () {
+      if (_status == AuthStatus.initial) {
         _status = AuthStatus.unauthenticated;
+        notifyListeners();
       }
-      notifyListeners();
     });
+
+    _authService.authStateChanges.listen(
+          (firebaseUser) async {
+        if (firebaseUser != null) {
+          _user = await _authService.getCachedUser();
+          _status = AuthStatus.authenticated;
+        } else {
+          _user = null;
+          _status = AuthStatus.unauthenticated;
+        }
+        notifyListeners();
+      },
+      onError: (_) {
+        _status = AuthStatus.unauthenticated;
+        notifyListeners();
+      },
+    );
   }
 
   Future<bool> login(String email, String password) async {

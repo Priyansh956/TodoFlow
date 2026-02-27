@@ -15,16 +15,27 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool _minDelayDone = false;
+  bool _navigated = false;
+
   @override
   void initState() {
     super.initState();
-    _navigate();
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      if (!mounted) return;
+      setState(() => _minDelayDone = true);
+      _tryNavigate();
+    });
   }
 
-  Future<void> _navigate() async {
-    await Future.delayed(const Duration(milliseconds: 2200));
-    if (!mounted) return;
+  void _tryNavigate() {
+    if (_navigated || !mounted) return;
     final auth = context.read<AuthProvider>();
+    if (!_minDelayDone) return;
+    if (auth.status == AuthStatus.initial ||
+        auth.status == AuthStatus.loading) return;
+
+    _navigated = true;
     if (auth.isAuthenticated) {
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     } else {
@@ -34,6 +45,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    if (_minDelayDone &&
+        auth.status != AuthStatus.initial &&
+        auth.status != AuthStatus.loading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _tryNavigate());
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.primary,
       body: Center(
@@ -55,7 +73,9 @@ class _SplashScreenState extends State<SplashScreen> {
             )
                 .animate()
                 .fadeIn(duration: 600.ms)
-                .scale(begin: const Offset(0.6, 0.6), curve: Curves.elasticOut),
+                .scale(
+                begin: const Offset(0.6, 0.6),
+                curve: Curves.elasticOut),
             const SizedBox(height: 24),
             const Text(
               AppStrings.appName,
@@ -76,9 +96,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.white.withOpacity(0.75),
                 fontSize: 15,
               ),
-            )
-                .animate()
-                .fadeIn(delay: 500.ms, duration: 500.ms),
+            ).animate().fadeIn(delay: 500.ms, duration: 500.ms),
             const SizedBox(height: 64),
             SizedBox(
               width: 32,

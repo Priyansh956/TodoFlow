@@ -1,9 +1,8 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../config/app_theme.dart';
+import '../../config/app_theme.dart';
 
-// ─── Primary Button ───────────────────────────────────────────────────────────
 class AppButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -45,11 +44,11 @@ class AppButton extends StatelessWidget {
     if (outlined) {
       return OutlinedButton(onPressed: onPressed, child: child);
     }
-    return ElevatedButton(onPressed: isLoading ? null : onPressed, child: child);
+    return ElevatedButton(
+        onPressed: isLoading ? null : onPressed, child: child);
   }
 }
 
-// ─── Text Field ───────────────────────────────────────────────────────────────
 class AppTextField extends StatelessWidget {
   final String label;
   final String? hint;
@@ -105,7 +104,6 @@ class AppTextField extends StatelessWidget {
   }
 }
 
-// ─── Loading Shimmer ──────────────────────────────────────────────────────────
 class TaskListSkeleton extends StatelessWidget {
   const TaskListSkeleton({super.key});
 
@@ -126,8 +124,10 @@ class _SkeletonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? AppTheme.cardDark : const Color(0xFFEEEDF6);
-    final highlightColor = isDark ? AppTheme.surfaceDark : Colors.white;
+    final baseColor =
+    isDark ? AppTheme.cardDark : const Color(0xFFEEEDF6);
+    final highlightColor =
+    isDark ? AppTheme.surfaceDark : Colors.white;
 
     return Container(
       height: 100,
@@ -137,11 +137,12 @@ class _SkeletonCard extends StatelessWidget {
       ),
     )
         .animate(onPlay: (c) => c.repeat())
-        .shimmer(duration: 1200.ms, color: highlightColor.withOpacity(0.4));
+        .shimmer(
+        duration: 1200.ms,
+        color: highlightColor.withOpacity(0.4));
   }
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
 class EmptyState extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -169,20 +170,22 @@ class EmptyState extends StatelessWidget {
             Container(
               width: 88,
               height: 88,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppTheme.primaryLight,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: AppTheme.primary, size: 40),
-            )
-                .animate()
-                .scale(begin: const Offset(0.7, 0.7), curve: Curves.elasticOut),
+              child:
+              Icon(icon, color: AppTheme.primary, size: 40),
+            ).animate().scale(
+                begin: const Offset(0.7, 0.7),
+                curve: Curves.elasticOut),
             const SizedBox(height: 20),
             Text(
               title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
             ).animate().fadeIn(delay: 100.ms),
             const SizedBox(height: 8),
@@ -198,7 +201,8 @@ class EmptyState extends StatelessWidget {
               const SizedBox(height: 24),
               SizedBox(
                 width: 180,
-                child: AppButton(label: actionLabel!, onPressed: onAction),
+                child: AppButton(
+                    label: actionLabel!, onPressed: onAction),
               ).animate().fadeIn(delay: 300.ms),
             ],
           ],
@@ -208,7 +212,6 @@ class EmptyState extends StatelessWidget {
   }
 }
 
-// ─── Error State ──────────────────────────────────────────────────────────────
 class ErrorState extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
@@ -236,9 +239,10 @@ class ErrorState extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               'Something went wrong',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             Text(
@@ -267,7 +271,6 @@ class ErrorState extends StatelessWidget {
   }
 }
 
-// ─── Status Badge ─────────────────────────────────────────────────────────────
 class StatusBadge extends StatelessWidget {
   final String label;
   final Color color;
@@ -289,6 +292,39 @@ class StatusBadge extends StatelessWidget {
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
+      ),
+    );
+  }
+}
+
+class ErrorBanner extends StatelessWidget {
+  final String message;
+  const ErrorBanner({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFEBEE),
+        borderRadius: BorderRadius.circular(12),
+        border:
+        Border.all(color: const Color(0xFFEF5350).withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline,
+              color: Color(0xFFEF5350), size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                  color: Color(0xFFEF5350), fontSize: 13),
+            ),
+          ),
+        ],
       ),
     );
   }

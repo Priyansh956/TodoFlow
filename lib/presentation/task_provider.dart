@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import '../../core/app_exceptions.dart';
-import '../../data/task_model.dart';
-import '../../data/task_service.dart';
+import '../core/app_exceptions.dart';
+import '../data/task_model.dart';
+import '../data/task_service.dart';
 
 enum TaskViewState { initial, loading, loaded, empty, error }
 
@@ -12,28 +12,19 @@ class TaskProvider extends ChangeNotifier {
   List<Task> _tasks = [];
   String? _errorMessage;
   bool _isSubmitting = false;
-
-  // Pagination
-  bool _hasMore = true;
-  bool _isFetchingMore = false;
-  static const int _pageSize = 15;
-
-  // Filter
   TaskStatus? _filterStatus;
 
   TaskProvider(this._taskService);
 
   TaskViewState get state => _state;
+  String? get errorMessage => _errorMessage;
+  bool get isSubmitting => _isSubmitting;
+  TaskStatus? get filterStatus => _filterStatus;
+
   List<Task> get tasks {
     if (_filterStatus == null) return _tasks;
     return _tasks.where((t) => t.status == _filterStatus).toList();
   }
-
-  String? get errorMessage => _errorMessage;
-  bool get isSubmitting => _isSubmitting;
-  bool get hasMore => _hasMore;
-  bool get isFetchingMore => _isFetchingMore;
-  TaskStatus? get filterStatus => _filterStatus;
 
   int get todoCount => _tasks.where((t) => t.status == TaskStatus.todo).length;
   int get inProgressCount =>
@@ -41,44 +32,22 @@ class TaskProvider extends ChangeNotifier {
   int get doneCount => _tasks.where((t) => t.status == TaskStatus.done).length;
 
   Future<void> loadTasks(String userId, {bool refresh = false}) async {
-    if (refresh) {
-      _tasks = [];
-      _hasMore = true;
-    }
-
+    if (refresh) _tasks = [];
     _state = TaskViewState.loading;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final result = await _taskService.getTasks(userId, limit: _pageSize);
+      final result = await _taskService.getTasks(userId);
       _tasks = result;
-      _hasMore = result.length == _pageSize;
       _state = _tasks.isEmpty ? TaskViewState.empty : TaskViewState.loaded;
     } on AppException catch (e) {
       _errorMessage = e.message;
       _state = TaskViewState.error;
+    } catch (e) {
+      _errorMessage = 'Something went wrong.';
+      _state = TaskViewState.error;
     }
-    notifyListeners();
-  }
-
-  Future<void> loadMore(String userId) async {
-    if (!_hasMore || _isFetchingMore) return;
-    _isFetchingMore = true;
-    notifyListeners();
-
-    try {
-      final result = await _taskService.getTasks(
-        userId,
-        limit: _pageSize,
-      );
-      _tasks.addAll(result);
-      _hasMore = result.length == _pageSize;
-    } on AppException catch (_) {
-      // Silent fail for pagination
-    }
-
-    _isFetchingMore = false;
     notifyListeners();
   }
 

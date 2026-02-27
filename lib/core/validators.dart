@@ -2,9 +2,7 @@ class Validators {
   static String? email(String? value) {
     if (value == null || value.trim().isEmpty) return 'Email is required';
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!emailRegex.hasMatch(value.trim())) {
-      return 'Enter a valid email address';
-    }
+    if (!emailRegex.hasMatch(value.trim())) return 'Enter a valid email address';
     return null;
   }
 
@@ -28,14 +26,7 @@ class Validators {
 
   static String? taskDescription(String? value) {
     if (value == null || value.trim().isEmpty) return 'Description is required';
-    if (value.trim().length > 500) {
-      return 'Description must be under 500 characters';
-    }
-    return null;
-  }
-
-  static String? required(String? value, String fieldName) {
-    if (value == null || value.trim().isEmpty) return '$fieldName is required';
+    if (value.trim().length > 500) return 'Description must be under 500 characters';
     return null;
   }
 }

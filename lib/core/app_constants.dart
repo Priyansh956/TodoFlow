@@ -1,15 +1,51 @@
-class StorageKeys {
-  static const String userName = 'user_name';
-  static const String userEmail = 'user_email';
-  static const String userId = 'user_id';
+class AppException implements Exception {
+  final String message;
+  final String? code;
+  const AppException(this.message, {this.code});
+
+  @override
+  String toString() => message;
 }
 
-class FirestoreCollections {
-  static const String tasks = 'tasks';
-  static const String users = 'users';
+class NetworkException extends AppException {
+  const NetworkException([super.message = 'No internet connection.']);
 }
 
-class AppStrings {
-  static const String appName = 'TaskFlow';
-  static const String tagline = 'Organize. Focus. Achieve.';
+class ServerException extends AppException {
+  const ServerException([super.message = 'A server error occurred.']);
+}
+
+class AuthException extends AppException {
+  const AuthException(super.message, {super.code});
+}
+
+class NotFoundException extends AppException {
+  const NotFoundException([super.message = 'Resource not found.']);
+}
+
+class UnknownException extends AppException {
+  const UnknownException([super.message = 'An unexpected error occurred.']);
+}
+
+String mapFirebaseAuthError(String code) {
+  switch (code) {
+    case 'user-not-found':
+      return 'No account found with this email.';
+    case 'wrong-password':
+      return 'Incorrect password. Please try again.';
+    case 'email-already-in-use':
+      return 'An account already exists with this email.';
+    case 'weak-password':
+      return 'Password must be at least 6 characters.';
+    case 'invalid-email':
+      return 'Please enter a valid email address.';
+    case 'network-request-failed':
+      return 'Network error. Please check your connection.';
+    case 'too-many-requests':
+      return 'Too many attempts. Please try again later.';
+    case 'invalid-credential':
+      return 'Invalid email or password.';
+    default:
+      return 'Authentication failed. Please try again.';
+  }
 }

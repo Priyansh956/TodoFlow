@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../presentation/screens/login_screen.dart';
-import '../../presentation/screens/register_screen.dart';
-import '../../presentation/screens/home_screen.dart';
-import '../../presentation/screens/task_detail_screen.dart';
-import '../../presentation/screens/task_form_screen.dart';
-import '../../presentation/screens/splash_screen.dart';
+import '../presentation/screens/splash_screen.dart';
+import '../presentation/screens/login_screen.dart';
+import '../presentation/screens/register_screen.dart';
+import '../presentation/screens/home_screen.dart';
+import '../presentation/screens/task_detail_screen.dart';
+import '../presentation/screens/task_form_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -28,11 +28,9 @@ class AppRoutes {
       case taskNew:
         return _slide(const TaskFormScreen());
       case taskDetail:
-        final task = settings.arguments;
-        return _slide(TaskDetailScreen(taskId: task as String));
+        return _slide(TaskDetailScreen(taskId: settings.arguments as String));
       case taskEdit:
-        final taskId = settings.arguments as String;
-        return _slide(TaskFormScreen(taskId: taskId));
+        return _slide(TaskFormScreen(taskId: settings.arguments as String));
       default:
         return _slide(const LoginScreen());
     }
@@ -47,9 +45,7 @@ class AppRoutes {
           end: Offset.zero,
         ).chain(CurveTween(curve: Curves.easeOutCubic));
         return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
+            position: animation.drive(tween), child: child);
       },
       transitionDuration: const Duration(milliseconds: 300),
     );

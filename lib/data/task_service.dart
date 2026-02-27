@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:taskflow/data/task_model.dart';
-import '../../core/app_constants.dart';
-import '../../core/app_exceptions.dart';
+import '../core/app_constants.dart';
+import '../core/app_exceptions.dart' hide ServerException;
+import 'task_model.dart';
 
 abstract class TaskService {
-  Future<List<Task>> getTasks(String userId, {int limit, DocumentSnapshot? lastDoc});
-  Future<Task> getTask(String taskId);
+  Future<List<Task>> getTasks(String userId, {int limit});
   Future<Task> createTask(Task task);
   Future<Task> updateTask(Task task);
   Future<void> deleteTask(String taskId);
@@ -22,36 +21,16 @@ class FirestoreTaskService implements TaskService {
       _firestore.collection(FirestoreCollections.tasks);
 
   @override
-  Future<List<Task>> getTasks(
-      String userId, {
-        int limit = 20,
-        DocumentSnapshot? lastDoc,
-      }) async {
+  Future<List<Task>> getTasks(String userId, {int limit = 20}) async {
     try {
-      Query query = _tasksRef
+      final snapshot = await _tasksRef
           .where('userId', isEqualTo: userId)
           .orderBy('createdAt', descending: true)
-          .limit(limit);
-
-      if (lastDoc != null) {
-        query = query.startAfterDocument(lastDoc);
-      }
-
-      final snapshot = await query.get();
+          .limit(limit)
+          .get();
       return snapshot.docs.map((doc) => Task.fromFirestore(doc)).toList();
     } on FirebaseException catch (e) {
       throw ServerException('Failed to fetch tasks: ${e.message}');
-    }
-  }
-
-  @override
-  Future<Task> getTask(String taskId) async {
-    try {
-      final doc = await _tasksRef.doc(taskId).get();
-      if (!doc.exists) throw const NotFoundException('Task not found.');
-      return Task.fromFirestore(doc);
-    } on FirebaseException catch (e) {
-      throw ServerException('Failed to fetch task: ${e.message}');
     }
   }
 
@@ -92,7 +71,7 @@ class FirestoreTaskService implements TaskService {
         .where('userId', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-        snapshot.docs.map((doc) => Task.fromFirestore(doc)).toList());
+        .map((snap) =>
+        snap.docs.map((doc) => Task.fromFirestore(doc)).toList());
   }
 }

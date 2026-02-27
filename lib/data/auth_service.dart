@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:taskflow/data/user_model.dart';
-import '../../core/app_constants.dart';
-import '../../core/app_exceptions.dart';
+import '../core/app_constants.dart';
+import '../core/app_exceptions.dart' hide AuthException, mapFirebaseAuthError;
+import 'user_model.dart';
 
 abstract class AuthService {
   Future<AppUser> login(String email, String password);
@@ -41,12 +41,11 @@ class FirebaseAuthService implements AuthService {
         password: password,
       );
       final uid = credential.user!.uid;
-
-      // Fetch user data from Firestore
-      final doc =
-      await _firestore.collection(FirestoreCollections.users).doc(uid).get();
+      final doc = await _firestore
+          .collection(FirestoreCollections.users)
+          .doc(uid)
+          .get();
       final user = AppUser.fromMap({...doc.data()!, 'uid': uid});
-
       await _cacheUser(user);
       return user;
     } on FirebaseAuthException catch (e) {
@@ -64,21 +63,12 @@ class FirebaseAuthService implements AuthService {
         password: password,
       );
       final uid = credential.user!.uid;
-
-      // Update Firebase Auth display name
       await credential.user!.updateDisplayName(name.trim());
-
-      // Save user profile to Firestore
-      final user = AppUser(
-        uid: uid,
-        name: name.trim(),
-        email: email.trim(),
-      );
+      final user = AppUser(uid: uid, name: name.trim(), email: email.trim());
       await _firestore
           .collection(FirestoreCollections.users)
           .doc(uid)
           .set(user.toMap());
-
       await _cacheUser(user);
       return user;
     } on FirebaseAuthException catch (e) {

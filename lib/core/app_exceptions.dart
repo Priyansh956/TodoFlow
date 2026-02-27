@@ -1,7 +1,6 @@
 class AppException implements Exception {
   final String message;
   final String? code;
-
   const AppException(this.message, {this.code});
 
   @override
@@ -13,7 +12,7 @@ class NetworkException extends AppException {
 }
 
 class ServerException extends AppException {
-  const ServerException([super.message = 'A server error occurred. Please try again.']);
+  const ServerException([super.message = 'A server error occurred.']);
 }
 
 class AuthException extends AppException {
@@ -44,6 +43,8 @@ String mapFirebaseAuthError(String code) {
       return 'Network error. Please check your connection.';
     case 'too-many-requests':
       return 'Too many attempts. Please try again later.';
+    case 'invalid-credential':
+      return 'Invalid email or password.';
     default:
       return 'Authentication failed. Please try again.';
   }

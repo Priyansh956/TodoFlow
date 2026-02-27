@@ -4,10 +4,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../config/app_routes.dart';
 import '../../config/app_theme.dart';
-import '../../core/app_constants.dart';
 import '../../core/validators.dart';
-import '../../presentation//auth_provider.dart';
-import '../../presentation/widgets/common_widgets.dart';
+import '../auth_provider.dart';
+import '../widgets/common_widgets.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -55,13 +54,39 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                _buildHeader(context),
-                const SizedBox(height: 40),
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryLight,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.check_circle_rounded,
+                      color: AppTheme.primary, size: 30),
+                ).animate().scale(
+                    begin: const Offset(0.5, 0.5),
+                    curve: Curves.elasticOut),
+                const SizedBox(height: 20),
+                Text(
+                  'Welcome back!',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineMedium
+                      ?.copyWith(fontWeight: FontWeight.w800),
+                ).animate().fadeIn(delay: 100.ms),
+                const SizedBox(height: 6),
+                Text(
+                  'Sign in to continue to TaskFlow',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.grey),
+                ).animate().fadeIn(delay: 150.ms),
+                const SizedBox(height: 36),
                 if (auth.errorMessage != null)
-                  _ErrorBanner(message: auth.errorMessage!)
+                  ErrorBanner(message: auth.errorMessage!)
                       .animate()
                       .shake(hz: 3),
-                const SizedBox(height: 8),
                 AppTextField(
                   label: 'Email',
                   hint: 'you@example.com',
@@ -84,8 +109,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           : Icons.visibility_off_outlined,
                       size: 20,
                     ),
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                   ),
                 ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2, end: 0),
                 const SizedBox(height: 32),
@@ -99,10 +124,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        "Don't have an account?",
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      Text("Don't have an account?",
+                          style: Theme.of(context).textTheme.bodyMedium),
                       TextButton(
                         onPressed: () => Navigator.pushReplacementNamed(
                             context, AppRoutes.register),
@@ -115,75 +138,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            color: AppTheme.primaryLight,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.check_circle_rounded,
-            color: AppTheme.primary,
-            size: 30,
-          ),
-        ).animate().scale(begin: const Offset(0.5, 0.5), curve: Curves.elasticOut),
-        const SizedBox(height: 20),
-        Text(
-          'Welcome back!',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0),
-        const SizedBox(height: 6),
-        Text(
-          'Sign in to continue to ${AppStrings.appName}',
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(color: Colors.grey),
-        ).animate().fadeIn(delay: 150.ms),
-      ],
-    );
-  }
-}
-
-class _ErrorBanner extends StatelessWidget {
-  final String message;
-  const _ErrorBanner({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFEBEE),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFEF5350).withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: Color(0xFFEF5350), size: 18),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(
-                color: Color(0xFFEF5350),
-                fontSize: 13,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
